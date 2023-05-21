@@ -48,7 +48,7 @@ $ minica --domains foo.com
 $ minica --domains '*.foo.com'
 ```
 
-# Compared to the original, there are changes.
+# Modified
 
 ## file name and extension:
 
