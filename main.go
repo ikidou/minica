@@ -227,7 +227,7 @@ func sign(iss *issuer, domains []string, ipAddresses []string) (*x509.Certificat
 	if err != nil && !os.IsExist(err) {
 		return nil, err
 	}
-	key, err := makeKey(fmt.Sprintf("%s/key.pem", cnFolder))
+	key, err := makeKey(fmt.Sprintf("%s.key", cnFolder))
 	if err != nil {
 		return nil, err
 	}
@@ -262,7 +262,7 @@ func sign(iss *issuer, domains []string, ipAddresses []string) (*x509.Certificat
 	if err != nil {
 		return nil, err
 	}
-	file, err := os.OpenFile(fmt.Sprintf("%s/cert.pem", cnFolder), os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+	file, err := os.OpenFile(fmt.Sprintf("%s.crt", cnFolder), os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
 	if err != nil {
 		return nil, err
 	}
@@ -285,8 +285,8 @@ func split(s string) (results []string) {
 }
 
 func main2() error {
-	var caKey = flag.String("ca-key", "minica-key.pem", "Root private key filename, PEM encoded.")
-	var caCert = flag.String("ca-cert", "minica.pem", "Root certificate filename, PEM encoded.")
+	var caKey = flag.String("ca-key", "minica_rootca.key", "Root private key filename, PEM encoded.")
+	var caCert = flag.String("ca-cert", "minica_rootca.crt", "Root certificate filename, PEM encoded.")
 	var domains = flag.String("domains", "", "Comma separated domain names to include as Server Alternative Names.")
 	var ipAddresses = flag.String("ip-addresses", "", "Comma separated IP addresses to include as Server Alternative Names.")
 	flag.Usage = func() {
