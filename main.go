@@ -112,7 +112,7 @@ func makeIssuer(keyFile, certFile string, alg x509.PublicKeyAlgorithm) error {
 	if err != nil {
 		return err
 	}
-	_, err = makeRootCert(key, certFile)
+	_, err = makeRootCert(key, certFile, alg)
 	if err != nil {
 		return err
 	}
@@ -129,7 +129,7 @@ func makeKey(filename string, alg x509.PublicKeyAlgorithm) (crypto.Signer, error
 			return nil, err
 		}
 	case alg == x509.ECDSA:
-		key, err = ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
+		key, err = ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 		if err != nil {
 			return nil, err
 		}
@@ -153,7 +153,7 @@ func makeKey(filename string, alg x509.PublicKeyAlgorithm) (crypto.Signer, error
 	return key, nil
 }
 
-func makeRootCert(key crypto.Signer, filename string) (*x509.Certificate, error) {
+func makeRootCert(key crypto.Signer, filename string, alg x509.PublicKeyAlgorithm) (*x509.Certificate, error) {
 	serial, err := rand.Int(rand.Reader, big.NewInt(math.MaxInt64))
 	if err != nil {
 		return nil, err
@@ -164,7 +164,7 @@ func makeRootCert(key crypto.Signer, filename string) (*x509.Certificate, error)
 	}
 	template := &x509.Certificate{
 		Subject: pkix.Name{
-			CommonName: "minica root ca " + hex.EncodeToString(serial.Bytes()[:3]),
+			CommonName: "minica " + alg.String() + " Root CA " + hex.EncodeToString(serial.Bytes()[:3]),
 		},
 		SerialNumber: serial,
 		NotBefore:    time.Now(),
@@ -176,7 +176,8 @@ func makeRootCert(key crypto.Signer, filename string) (*x509.Certificate, error)
 		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth},
 		BasicConstraintsValid: true,
 		IsCA:                  true,
-		MaxPathLenZero:        true,
+		MaxPathLen             1,
+		MaxPathLenZero:        false,
 	}
 
 	der, err := x509.CreateCertificate(rand.Reader, template, template, key.Public(), key)
